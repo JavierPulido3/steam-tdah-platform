@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Entrar</title>
+</head>
+
+<body>
+    <h1>Iniciar sesión</h1>
+
+    {% for mensaje in get_flashed_messages() %}
+    <p>{{ mensaje }}</p>
+    {% endfor %}
+
+    <form method="post">
+        <label>Correo <input type="email" name="correo" required></label><br>
+        <label>Contraseña <input type="password" name="clave" required></label><br>
+        <button type="submit">Entrar</button>
+    </form>
+</body>
+
+</html>
