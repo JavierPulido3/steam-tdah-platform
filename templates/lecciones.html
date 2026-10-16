@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ curso.titulo }}</title>
+</head>
+
+<body>
+    <h1>{{ curso.titulo }}</h1>
+    <p>{{ curso.descripcion }}</p>
+    <p>Tu avance: {{ porcentaje }}%</p>
+
+    <ul>
+        {% for l in curso.lecciones %}
+        <li>
+            <a href="{{ url_for('main.leccion', leccion_id=l.id) }}">
+                {{ l.orden }}. {{ l.area }}: {{ l.titulo }}
+            </a>
+            {% if l.id in completadas %}(completada){% else %}(pendiente){% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('main.logout') }}">Salir</a>
+</body>
+
+</html>

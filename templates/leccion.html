@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ leccion.titulo }}</title>
+</head>
+
+<body>
+    <h1>{{ leccion.area }}: {{ leccion.titulo }}</h1>
+
+    {% for linea in leccion.contenido.split('\n') %}
+    <p>{{ linea }}</p>
+    {% endfor %}
+
+    <a href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a>
+</body>
+
+</html>
