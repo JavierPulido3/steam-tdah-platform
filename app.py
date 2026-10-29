@@ -5,11 +5,13 @@ from routes import bp
 from seed import cargar_datos_iniciales
 
 
-def crear_app():
+def crear_app(config=None):
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "cambia-esta-clave-despues"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    if config:
+        app.config.update(config)
 
     db.init_app(app)
     app.register_blueprint(bp)
