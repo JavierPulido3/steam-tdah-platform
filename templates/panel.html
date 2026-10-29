@@ -1,47 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "base.html" %}
+{% block titulo %}Panel de estudiantes{% endblock %}
+{% block clase %}ancho{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Panel de estudiantes</title>
-</head>
+{% block contenido %}
+<h1>Panel de estudiantes</h1>
+<p>Avance en el curso {{ curso.titulo }}.</p>
 
-<body>
-    <h1>Panel de estudiantes</h1>
-    <p>Avance en el curso {{ curso.titulo }}.</p>
-
-    <table border="1" cellpadding="6">
-        <thead>
-            <tr>
-                <th>Estudiante</th>
-                {% for leccion in curso.lecciones %}
-                <th>{{ leccion.area }}</th>
-                {% endfor %}
-                <th>Avance</th>
-                <th>Aciertos</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for fila in filas %}
-            <tr>
-                <th>{{ fila.nombre }}</th>
-                {% for leccion in curso.lecciones %}
-                <td>{{ "Hecha" if leccion.id in fila.completadas else "—" }}</td>
-                {% endfor %}
-                <td>{{ fila.porcentaje }}%</td>
-                <td>{{ fila.aciertos }} / {{ fila.intentos }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="{{ curso.lecciones|length + 3 }}">
-                    Todavía no hay estudiantes registrados.
-                </td>
-            </tr>
+<table class="tabla-panel">
+    <thead>
+        <tr>
+            <th>Estudiante</th>
+            {% for leccion in curso.lecciones %}
+            <th>{{ leccion.area }}</th>
             {% endfor %}
-        </tbody>
-    </table>
-
-    <p><a href="{{ url_for('main.logout') }}">Salir</a></p>
-</body>
-
-</html>
+            <th>Avance</th>
+            <th>Aciertos</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fila in filas %}
+        <tr>
+            <th>{{ fila.nombre }}</th>
+            {% for leccion in curso.lecciones %}
+            {% if leccion.id in fila.completadas %}
+            <td class="hecha-celda">Hecha</td>
+            {% else %}
+            <td>—</td>
+            {% endif %}
+            {% endfor %}
+            <td>{{ fila.porcentaje }}%</td>
+            <td>{{ fila.aciertos }} / {{ fila.intentos }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="{{ curso.lecciones|length + 3 }}">
+                Todavía no hay estudiantes registrados.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

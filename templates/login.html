@@ -1,23 +1,22 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "base.html" %}
+{% block titulo %}Entrar{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Entrar</title>
-</head>
-
-<body>
+{% block contenido %}
+<div class="tarjeta">
     <h1>Iniciar sesión</h1>
 
     {% for mensaje in get_flashed_messages() %}
-    <p>{{ mensaje }}</p>
+    <p class="mensaje error">{{ mensaje }}</p>
     {% endfor %}
 
     <form method="post">
-        <label>Correo <input type="email" name="correo" required></label><br>
-        <label>Contraseña <input type="password" name="clave" required></label><br>
-        <button type="submit">Entrar</button>
+        <label>Correo
+            <input type="email" name="correo" required>
+        </label>
+        <label>Contraseña
+            <input type="password" name="clave" required>
+        </label>
+        <button class="boton" type="submit">Entrar</button>
     </form>
-</body>
-
-</html>
+</div>
+{% endblock %}

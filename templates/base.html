@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Explorando STEAM{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+
+<body>
+    <header class="barra">
+        <a class="marca" href="{{ url_for('main.inicio') }}">Explorando STEAM</a>
+        {% if session.get('usuario_id') %}
+        <a class="salir" href="{{ url_for('main.logout') }}">Salir</a>
+        {% endif %}
+    </header>
+
+    <main class="contenido {% block clase %}{% endblock %}">
+        {% block contenido %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

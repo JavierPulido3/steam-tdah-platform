@@ -1,31 +1,29 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "base.html" %}
+{% block titulo %}{{ leccion.titulo }}{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>{{ leccion.titulo }}</title>
-</head>
+{% block contenido %}
+<h1>{{ leccion.area }}: {{ leccion.titulo }}</h1>
 
-<body>
-    <h1>{{ leccion.area }}: {{ leccion.titulo }}</h1>
-
+<div class="tarjeta">
     {% for linea in leccion.contenido.split('\n') %}
     <p>{{ linea }}</p>
     {% endfor %}
+</div>
 
-    {% if pregunta %}
+{% if pregunta %}
+<div class="tarjeta">
     <h2>Pregunta</h2>
     <p>{{ pregunta.enunciado }}</p>
 
     {% for mensaje in get_flashed_messages() %}
-    <p>{{ mensaje }}</p>
+    <p class="mensaje error">{{ mensaje }}</p>
     {% endfor %}
 
     {% if respuesta %}
     {% if respuesta.es_correcta %}
-    <p>¡Correcto!</p>
+    <p class="mensaje ok">¡Correcto!</p>
     {% else %}
-    <p>Esa no era. La respuesta correcta es:
+    <p class="mensaje error">Esa no era. La respuesta correcta es:
         {% for o in pregunta.opciones if o.es_correcta %}{{ o.texto }}{% endfor %}.
     </p>
     {% endif %}
@@ -33,17 +31,16 @@
     {% else %}
     <form method="post" action="{{ url_for('main.responder', leccion_id=leccion.id) }}">
         {% for o in pregunta.opciones %}
-        <label>
+        <label class="opcion">
             <input type="radio" name="opcion_id" value="{{ o.id }}" required>
             {{ o.texto }}
-        </label><br>
+        </label>
         {% endfor %}
-        <button type="submit">Responder</button>
+        <button class="boton" type="submit">Responder</button>
     </form>
     {% endif %}
-    {% endif %}
+</div>
+{% endif %}
 
-    <p><a href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a></p>
-</body>
-
-</html>
+<p><a href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a></p>
+{% endblock %}
