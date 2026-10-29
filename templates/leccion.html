@@ -13,7 +13,37 @@
     <p>{{ linea }}</p>
     {% endfor %}
 
-    <a href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a>
+    {% if pregunta %}
+    <h2>Pregunta</h2>
+    <p>{{ pregunta.enunciado }}</p>
+
+    {% for mensaje in get_flashed_messages() %}
+    <p>{{ mensaje }}</p>
+    {% endfor %}
+
+    {% if respuesta %}
+    {% if respuesta.es_correcta %}
+    <p>¡Correcto!</p>
+    {% else %}
+    <p>Esa no era. La respuesta correcta es:
+        {% for o in pregunta.opciones if o.es_correcta %}{{ o.texto }}{% endfor %}.
+    </p>
+    {% endif %}
+    <p>Lección completada.</p>
+    {% else %}
+    <form method="post" action="{{ url_for('main.responder', leccion_id=leccion.id) }}">
+        {% for o in pregunta.opciones %}
+        <label>
+            <input type="radio" name="opcion_id" value="{{ o.id }}" required>
+            {{ o.texto }}
+        </label><br>
+        {% endfor %}
+        <button type="submit">Responder</button>
+    </form>
+    {% endif %}
+    {% endif %}
+
+    <p><a href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a></p>
 </body>
 
 </html>

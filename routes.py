@@ -1,9 +1,19 @@
+from datetime import datetime
 from functools import wraps
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from werkzeug.security import check_password_hash
 
-from models import Curso, Leccion, Progreso, Usuario, db
+from models import Curso, Leccion, Opcion, Progreso, RespuestaEstudiante, Usuario, db
 
 bp = Blueprint("main", __name__)
 
@@ -78,4 +88,58 @@ def lecciones():
 @login_requerido
 def leccion(leccion_id):
     leccion = db.get_or_404(Leccion, leccion_id)
-    return render_template("leccion.html", leccion=leccion)
+    pregunta = leccion.preguntas[0] if leccion.preguntas else None
+    respuesta = None
+    if pregunta:
+        respuesta = RespuestaEstudiante.query.filter_by(
+            usuario_id=session["usuario_id"], pregunta_id=pregunta.id
+        ).first()
+    return render_template(
+        "leccion.html", leccion=leccion, pregunta=pregunta, respuesta=respuesta
+    )
+
+
+@bp.route("/leccion/<int:leccion_id>/responder", methods=["POST"])
+@login_requerido
+def responder(leccion_id):
+    if session["rol"] == "instructor":
+        abort(403)
+
+    leccion = db.get_or_404(Leccion, leccion_id)
+    if not leccion.preguntas:
+        abort(404)
+    pregunta = leccion.preguntas[0]
+    usuario_id = session["usuario_id"]
+
+    ya_respondida = RespuestaEstudiante.query.filter_by(
+        usuario_id=usuario_id, pregunta_id=pregunta.id
+    ).first()
+    if ya_respondida:
+        return redirect(url_for("main.leccion", leccion_id=leccion.id))
+
+    opcion_id = request.form.get("opcion_id", type=int)
+    opcion = db.session.get(Opcion, opcion_id) if opcion_id else None
+    if opcion is None or opcion.pregunta_id != pregunta.id:
+        flash("Elige una de las opciones.")
+        return redirect(url_for("main.leccion", leccion_id=leccion.id))
+
+    db.session.add(
+        RespuestaEstudiante(
+            usuario_id=usuario_id,
+            pregunta_id=pregunta.id,
+            opcion_elegida_id=opcion.id,
+            es_correcta=opcion.es_correcta,
+        )
+    )
+
+    progreso = Progreso.query.filter_by(
+        usuario_id=usuario_id, leccion_id=leccion.id
+    ).first()
+    if progreso is None:
+        progreso = Progreso(usuario_id=usuario_id, leccion_id=leccion.id)
+        db.session.add(progreso)
+    progreso.completada = True
+    progreso.fecha_completada = datetime.now()
+
+    db.session.commit()
+    return redirect(url_for("main.leccion", leccion_id=leccion.id))
