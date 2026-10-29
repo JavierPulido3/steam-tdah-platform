@@ -28,15 +28,26 @@ def login_requerido(vista):
     return envoltura
 
 
+# NUEVO: va justo debajo de login_requerido
+def instructor_requerido(vista):
+    """Solo deja pasar al instructor; a los demás les responde 403."""
+    @wraps(vista)
+    def envoltura(*args, **kwargs):
+        if "usuario_id" not in session:
+            return redirect(url_for("main.login"))
+        if session.get("rol") != "instructor":
+            abort(403)
+        return vista(*args, **kwargs)
+    return envoltura
+
+
+# CAMBIÓ: el instructor ahora va al panel en vez de ver el texto provisional
 @bp.route("/")
 def inicio():
     if "usuario_id" not in session:
         return redirect(url_for("main.login"))
     if session["rol"] == "instructor":
-        return (
-            "Panel del instructor (pendiente). "
-            f"<a href='{url_for('main.logout')}'>Salir</a>"
-        )
+        return redirect(url_for("main.panel"))
     return redirect(url_for("main.lecciones"))
 
 
@@ -143,3 +154,29 @@ def responder(leccion_id):
 
     db.session.commit()
     return redirect(url_for("main.leccion", leccion_id=leccion.id))
+
+
+# NUEVO: va al final del archivo
+@bp.route("/panel")
+@instructor_requerido
+def panel():
+    curso = Curso.query.first()
+    total = len(curso.lecciones) or 1
+    estudiantes = (
+        Usuario.query.filter_by(rol="estudiante").order_by(Usuario.nombre).all()
+    )
+
+    filas = []
+    for estudiante in estudiantes:
+        completadas = {p.leccion_id for p in estudiante.progresos if p.completada}
+        filas.append(
+            {
+                "nombre": estudiante.nombre,
+                "completadas": completadas,
+                "porcentaje": round(len(completadas) * 100 / total),
+                "aciertos": sum(1 for r in estudiante.respuestas if r.es_correcta),
+                "intentos": len(estudiante.respuestas),
+            }
+        )
+
+    return render_template("panel.html", curso=curso, filas=filas)
