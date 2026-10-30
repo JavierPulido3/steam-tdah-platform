@@ -296,3 +296,31 @@ input[type="password"] {
     background: var(--error-fondo);
     color: var(--error);
 }
+
+.ronda {
+    color: var(--suave);
+    margin: 0;
+}
+
+.secuencia {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1rem 0;
+}
+
+.item-secuencia {
+    min-width: 64px;
+    padding: 0.6rem 0.9rem;
+    text-align: center;
+    font-size: 1.6rem;
+    background: var(--tarjeta);
+    border: 2px solid var(--borde);
+    border-radius: 12px;
+}
+
+.item-secuencia.pregunta {
+    border-style: dashed;
+    color: var(--primario);
+    font-weight: 700;
+}

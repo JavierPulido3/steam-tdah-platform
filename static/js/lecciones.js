@@ -1,6 +1,7 @@
 // Cada área STEAM usa su propia clase de actividad.
 const ACTIVIDADES = {
     "Ciencia": ActividadClasificacion,
+    "Matemáticas": ActividadPatron,
 };
 
 document.addEventListener("DOMContentLoaded", () => {
