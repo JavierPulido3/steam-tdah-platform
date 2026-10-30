@@ -324,3 +324,51 @@ input[type="password"] {
     color: var(--primario);
     font-weight: 700;
 }
+
+.mezcla {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+
+.signo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--suave);
+}
+
+.muestra {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 600;
+}
+
+.muestra .color {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    border: 2px solid var(--borde);
+    background: var(--tarjeta);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--primario);
+}
+
+.opcion-color {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.opcion-color .color-mini {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--borde);
+}
