@@ -10,6 +10,11 @@
     {% endfor %}
 </div>
 
+<div class="tarjeta" hidden>
+    <h2>Actividad</h2>
+    <div id="actividad" data-area="{{ leccion.area }}"></div>
+</div>
+
 {% if pregunta %}
 <div class="tarjeta">
     <h2>Pregunta</h2>
@@ -43,4 +48,10 @@
 {% endif %}
 
 <p><a href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a></p>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/actividad.js') }}"></script>
+<script src="{{ url_for('static', filename='js/actividad-clasificacion.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lecciones.js') }}"></script>
 {% endblock %}
