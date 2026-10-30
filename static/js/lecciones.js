@@ -2,6 +2,7 @@
 const ACTIVIDADES = {
     "Ciencia": ActividadClasificacion,
     "Tecnología": ActividadOrdenamiento,
+    "Ingeniería": ActividadConstruccion,
     "Arte": ActividadPrediccion,
     "Matemáticas": ActividadPatron,
 };
