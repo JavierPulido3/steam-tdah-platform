@@ -28,7 +28,6 @@ def login_requerido(vista):
     return envoltura
 
 
-# NUEVO: va justo debajo de login_requerido
 def instructor_requerido(vista):
     """Solo deja pasar al instructor; a los demás les responde 403."""
     @wraps(vista)
@@ -41,7 +40,6 @@ def instructor_requerido(vista):
     return envoltura
 
 
-# CAMBIÓ: el instructor ahora va al panel en vez de ver el texto provisional
 @bp.route("/")
 def inicio():
     if "usuario_id" not in session:
@@ -64,7 +62,7 @@ def login():
             session["rol"] = usuario.rol
             return redirect(url_for("main.inicio"))
 
-        flash("Correo o contraseña incorrectos.")
+        flash("Correo o contraseña incorrectos.", "error")
 
     return render_template("login.html")
 
@@ -100,13 +98,28 @@ def lecciones():
 def leccion(leccion_id):
     leccion = db.get_or_404(Leccion, leccion_id)
     pregunta = leccion.preguntas[0] if leccion.preguntas else None
-    respuesta = None
+    respuesta = elegida = correcta = progreso = None
+
     if pregunta:
         respuesta = RespuestaEstudiante.query.filter_by(
             usuario_id=session["usuario_id"], pregunta_id=pregunta.id
         ).first()
+
+    if respuesta:
+        elegida = db.session.get(Opcion, respuesta.opcion_elegida_id)
+        correcta = next((o for o in pregunta.opciones if o.es_correcta), None)
+        progreso = Progreso.query.filter_by(
+            usuario_id=session["usuario_id"], leccion_id=leccion.id
+        ).first()
+
     return render_template(
-        "leccion.html", leccion=leccion, pregunta=pregunta, respuesta=respuesta
+        "leccion.html",
+        leccion=leccion,
+        pregunta=pregunta,
+        respuesta=respuesta,
+        elegida=elegida,
+        correcta=correcta,
+        progreso=progreso,
     )
 
 
@@ -131,7 +144,7 @@ def responder(leccion_id):
     opcion_id = request.form.get("opcion_id", type=int)
     opcion = db.session.get(Opcion, opcion_id) if opcion_id else None
     if opcion is None or opcion.pregunta_id != pregunta.id:
-        flash("Elige una de las opciones.")
+        flash("Elige una de las opciones.", "error")
         return redirect(url_for("main.leccion", leccion_id=leccion.id))
 
     db.session.add(
@@ -153,15 +166,16 @@ def responder(leccion_id):
     progreso.fecha_completada = datetime.now()
 
     db.session.commit()
+    flash("¡Listo! Guardamos tu respuesta y la lección quedó completada.", "ok")
     return redirect(url_for("main.leccion", leccion_id=leccion.id))
 
 
-# NUEVO: va al final del archivo
 @bp.route("/panel")
 @instructor_requerido
 def panel():
     curso = Curso.query.first()
     total = len(curso.lecciones) or 1
+    por_pregunta = {l.preguntas[0].id: l.id for l in curso.lecciones if l.preguntas}
     estudiantes = (
         Usuario.query.filter_by(rol="estudiante").order_by(Usuario.nombre).all()
     )
@@ -169,10 +183,17 @@ def panel():
     filas = []
     for estudiante in estudiantes:
         completadas = {p.leccion_id for p in estudiante.progresos if p.completada}
+        resultados = {
+            por_pregunta[r.pregunta_id]: r.es_correcta
+            for r in estudiante.respuestas
+            if r.pregunta_id in por_pregunta
+        }
         filas.append(
             {
+                "id": estudiante.id,
                 "nombre": estudiante.nombre,
                 "completadas": completadas,
+                "resultados": resultados,
                 "porcentaje": round(len(completadas) * 100 / total),
                 "aciertos": sum(1 for r in estudiante.respuestas if r.es_correcta),
                 "intentos": len(estudiante.respuestas),
@@ -180,3 +201,47 @@ def panel():
         )
 
     return render_template("panel.html", curso=curso, filas=filas)
+
+
+@bp.route("/panel/estudiante/<int:usuario_id>")
+@instructor_requerido
+def detalle_estudiante(usuario_id):
+    estudiante = db.get_or_404(Usuario, usuario_id)
+    if estudiante.rol != "estudiante":
+        abort(404)
+
+    curso = Curso.query.first()
+    detalle = []
+    for leccion in curso.lecciones:
+        if not leccion.preguntas:
+            continue
+        pregunta = leccion.preguntas[0]
+        item = {
+            "orden": leccion.orden,
+            "area": leccion.area,
+            "pregunta": pregunta.enunciado,
+            "respondio": False,
+        }
+
+        respuesta = RespuestaEstudiante.query.filter_by(
+            usuario_id=estudiante.id, pregunta_id=pregunta.id
+        ).first()
+        if respuesta:
+            elegida = db.session.get(Opcion, respuesta.opcion_elegida_id)
+            correcta = next((o for o in pregunta.opciones if o.es_correcta), None)
+            progreso = Progreso.query.filter_by(
+                usuario_id=estudiante.id, leccion_id=leccion.id
+            ).first()
+            fecha = ""
+            if progreso and progreso.fecha_completada:
+                fecha = progreso.fecha_completada.strftime("%d/%m/%Y %H:%M")
+            item.update(
+                respondio=True,
+                elegida=elegida.texto,
+                correcta=correcta.texto,
+                acerto=respuesta.es_correcta,
+                fecha=fecha,
+            )
+        detalle.append(item)
+
+    return render_template("estudiante.html", estudiante=estudiante, detalle=detalle)

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}Detalle de {{ estudiante.nombre }}{% endblock %}
+{% block clase %}ancho{% endblock %}
+
+{% block contenido %}
+<h1>{{ estudiante.nombre }}</h1>
+<p><a href="{{ url_for('main.panel') }}">← Volver al panel</a></p>
+
+<table class="tabla-panel">
+    <thead>
+        <tr>
+            <th>Lección</th>
+            <th>Pregunta</th>
+            <th>Respondió</th>
+            <th>Respuesta correcta</th>
+            <th>Resultado</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in detalle %}
+        <tr>
+            <th>{{ d.orden }}. {{ d.area }}</th>
+            <td>{{ d.pregunta }}</td>
+            {% if d.respondio %}
+            <td>{{ d.elegida }}</td>
+            <td>{{ d.correcta }}</td>
+            {% if d.acerto %}
+            <td class="hecha-celda">✓ Acertó</td>
+            {% else %}
+            <td class="fallo-celda">✗ Falló</td>
+            {% endif %}
+            <td>{{ d.fecha }}</td>
+            {% else %}
+            <td colspan="4">Sin responder</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -4,6 +4,24 @@
 {% block contenido %}
 <h1>{{ leccion.area }}: {{ leccion.titulo }}</h1>
 
+{% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+<p class="mensaje {{ categoria }}">{{ mensaje }}</p>
+{% endfor %}
+
+{% if respuesta %}
+<div class="tarjeta">
+    <h2>Ya completaste esta lección</h2>
+    {% if progreso and progreso.fecha_completada %}
+    <p>Terminada el {{ progreso.fecha_completada.strftime('%d/%m/%Y a las %H:%M') }}.</p>
+    {% endif %}
+    {% if respuesta.es_correcta %}
+    <p class="mensaje ok">Respondiste bien: {{ elegida.texto }}.</p>
+    {% else %}
+    <p class="mensaje error">Respondiste: {{ elegida.texto }}. La respuesta correcta era: {{ correcta.texto }}.</p>
+    {% endif %}
+</div>
+{% endif %}
+
 <div class="tarjeta">
     {% for linea in leccion.contenido.split('\n') %}
     <p>{{ linea }}</p>
@@ -12,28 +30,21 @@
 
 <div class="tarjeta" hidden>
     <h2>Actividad</h2>
+    {% if respuesta %}
+    <details>
+        <summary>Volver a jugar (no cambia tu resultado)</summary>
+        <div id="actividad" data-area="{{ leccion.area }}"></div>
+    </details>
+    {% else %}
     <div id="actividad" data-area="{{ leccion.area }}"></div>
+    {% endif %}
 </div>
 
-{% if pregunta %}
+{% if pregunta and not respuesta %}
 <div class="tarjeta">
     <h2>Pregunta</h2>
     <p>{{ pregunta.enunciado }}</p>
 
-    {% for mensaje in get_flashed_messages() %}
-    <p class="mensaje error">{{ mensaje }}</p>
-    {% endfor %}
-
-    {% if respuesta %}
-    {% if respuesta.es_correcta %}
-    <p class="mensaje ok">¡Correcto!</p>
-    {% else %}
-    <p class="mensaje error">Esa no era. La respuesta correcta es:
-        {% for o in pregunta.opciones if o.es_correcta %}{{ o.texto }}{% endfor %}.
-    </p>
-    {% endif %}
-    <p>Lección completada.</p>
-    {% else %}
     <form method="post" action="{{ url_for('main.responder', leccion_id=leccion.id) }}">
         {% for o in pregunta.opciones %}
         <label class="opcion">
@@ -43,7 +54,6 @@
         {% endfor %}
         <button class="boton" type="submit">Responder</button>
     </form>
-    {% endif %}
 </div>
 {% endif %}
 

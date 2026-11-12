@@ -1,5 +1,5 @@
 from conftest import iniciar_sesion
-from models import Leccion, RespuestaEstudiante
+from models import Leccion, Opcion, RespuestaEstudiante, Usuario, db
 
 
 def datos_leccion(app, orden=1):
@@ -106,6 +106,19 @@ def test_el_avance_es_por_estudiante(app, client):
     assert "Tu avance: 0%" in r.get_data(as_text=True)
 
 
+def test_recargar_leccion_respondida_muestra_resumen_sin_repetir_confirmacion(app, client):
+    iniciar_sesion(client, "ana@demo.com")
+    leccion_id, correcta, _ = datos_leccion(app)
+    responder(client, leccion_id, correcta)
+
+    primera = client.get(f"/leccion/{leccion_id}").get_data(as_text=True)
+    assert "Guardamos tu respuesta" in primera
+
+    recarga = client.get(f"/leccion/{leccion_id}").get_data(as_text=True)
+    assert "Ya completaste esta lección" in recarga
+    assert "Guardamos tu respuesta" not in recarga
+
+
 # ---------- Panel del instructor y permisos ----------
 
 def test_estudiante_no_puede_ver_el_panel(client):
@@ -143,3 +156,26 @@ def test_instructor_no_puede_responder_cuestionarios(app, client):
     iniciar_sesion(client, "profe@demo.com")
     leccion_id, correcta, _ = datos_leccion(app)
     assert responder(client, leccion_id, correcta).status_code == 403
+
+
+def test_instructor_ve_en_que_se_equivoco_el_estudiante(app, client):
+    iniciar_sesion(client, "ana@demo.com")
+    leccion_id, _, incorrecta = datos_leccion(app)
+    responder(client, leccion_id, incorrecta)
+
+    with app.app_context():
+        ana_id = Usuario.query.filter_by(correo="ana@demo.com").one().id
+        texto_elegido = db.session.get(Opcion, incorrecta).texto
+
+    instructor = app.test_client()
+    iniciar_sesion(instructor, "profe@demo.com")
+    r = instructor.get(f"/panel/estudiante/{ana_id}")
+    assert r.status_code == 200
+    texto = r.get_data(as_text=True)
+    assert texto_elegido in texto
+    assert "Falló" in texto
+
+
+def test_estudiante_no_puede_ver_el_detalle(client):
+    iniciar_sesion(client, "ana@demo.com")
+    assert client.get("/panel/estudiante/1").status_code == 403

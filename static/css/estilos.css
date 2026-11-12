@@ -224,12 +224,19 @@ input[type="password"] {
     font-weight: 600;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
-    }
+.fallo-celda {
+    color: var(--error);
+    font-weight: 600;
 }
+
+details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primario);
+    margin-bottom: 0.75rem;
+}
+
+/* ---------- Actividades: base y clasificación ---------- */
 
 .fila-objetos,
 .fila-cajas {
@@ -297,6 +304,8 @@ input[type="password"] {
     color: var(--error);
 }
 
+/* ---------- Matemáticas: patrones ---------- */
+
 .ronda {
     color: var(--suave);
     margin: 0;
@@ -324,6 +333,8 @@ input[type="password"] {
     color: var(--primario);
     font-weight: 700;
 }
+
+/* ---------- Arte: mezcla de colores ---------- */
 
 .mezcla {
     display: flex;
@@ -372,6 +383,8 @@ input[type="password"] {
     border-radius: 50%;
     border: 2px solid var(--borde);
 }
+
+/* ---------- Tecnología: perro robot ---------- */
 
 .tablero {
     position: relative;
@@ -499,6 +512,8 @@ input[type="password"] {
     margin-top: 0.5rem;
 }
 
+/* ---------- Ingeniería: torre con física ---------- */
+
 .lienzo {
     margin: 1rem 0;
 }
@@ -520,4 +535,13 @@ input[type="password"] {
     vertical-align: middle;
     border: 2px solid var(--texto);
     border-radius: 3px;
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
 }

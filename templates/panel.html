@@ -4,7 +4,7 @@
 
 {% block contenido %}
 <h1>Panel de estudiantes</h1>
-<p>Avance en el curso {{ curso.titulo }}.</p>
+<p>Avance en el curso {{ curso.titulo }}. Toca el nombre de un estudiante para ver sus respuestas.</p>
 
 <table class="tabla-panel">
     <thead>
@@ -20,10 +20,14 @@
     <tbody>
         {% for fila in filas %}
         <tr>
-            <th>{{ fila.nombre }}</th>
+            <th><a href="{{ url_for('main.detalle_estudiante', usuario_id=fila.id) }}">{{ fila.nombre }}</a></th>
             {% for leccion in curso.lecciones %}
             {% if leccion.id in fila.completadas %}
-            <td class="hecha-celda">Hecha</td>
+            {% if fila.resultados.get(leccion.id) %}
+            <td class="hecha-celda">✓ Acertó</td>
+            {% else %}
+            <td class="fallo-celda">✗ Falló</td>
+            {% endif %}
             {% else %}
             <td>—</td>
             {% endif %}
