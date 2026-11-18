@@ -110,7 +110,7 @@ class ActividadPrediccion extends Actividad {
         const mezcla = ronda.a.toLowerCase() + " más " + ronda.b.toLowerCase()
             + " da " + ronda.resultado.toLowerCase() + ".";
         const ultima = this.indice === this.rondas.length - 1;
-        const cierre = ultima ? " ¡Terminaste la actividad! Ahora responde la pregunta de abajo." : "";
+        const cierre = ultima ? " " + this.cierre() : "";
 
         if (nombre === ronda.resultado) {
             this.decir("¡Bien! " + mezcla.charAt(0).toUpperCase() + mezcla.slice(1) + cierre, "correcto");

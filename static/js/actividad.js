@@ -2,6 +2,8 @@ class Actividad {
     constructor(contenedor) {
         this.el = contenedor;
         this.mensaje = null;
+        // La plantilla avisa si el estudiante ya respondió la pregunta de esta lección.
+        this.yaRespondida = contenedor.dataset.respondida === "true";
     }
 
     iniciar() {
@@ -38,7 +40,14 @@ class Actividad {
         this.decir(texto, "incorrecto");
     }
 
+    // Texto de cierre único para todos los juegos.
+    cierre() {
+        return this.yaRespondida
+            ? "¡Terminaste la actividad!"
+            : "¡Terminaste la actividad! Ahora responde la pregunta de abajo.";
+    }
+
     terminar() {
-        this.acierto("¡Terminaste la actividad! Ahora responde la pregunta de abajo.");
+        this.acierto(this.cierre());
     }
 }

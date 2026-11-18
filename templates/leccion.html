@@ -33,10 +33,10 @@
     {% if respuesta %}
     <details>
         <summary>Volver a jugar (no cambia tu resultado)</summary>
-        <div id="actividad" data-area="{{ leccion.area }}"></div>
+        <div id="actividad" data-area="{{ leccion.area }}" data-respondida="true"></div>
     </details>
     {% else %}
-    <div id="actividad" data-area="{{ leccion.area }}"></div>
+    <div id="actividad" data-area="{{ leccion.area }}" data-respondida="false"></div>
     {% endif %}
 </div>
 

@@ -338,7 +338,7 @@ class ActividadConstruccion extends Actividad {
         const enSuelo = this.colocados.filter((c) => c.y + this.altoBloque / 2 >= this.sueloY - 2);
         const anchoBase = Math.max(...enSuelo.map((c) => c.ancho));
         const baseAncha = anchoBase === this.tipos[0].ancho;
-        const cierre = " ¡Terminaste la actividad! Ahora responde la pregunta de abajo.";
+        const cierre = " " + this.cierre();
 
         this.acierto(
             baseAncha

@@ -317,10 +317,7 @@ class ActividadOrdenamiento extends Actividad {
             this.pintarPrograma(-1);
 
             if (this.nivel === this.niveles.length - 1) {
-                this.acierto(
-                    "¡Robi llegó al hueso! ¡Terminaste la actividad! " +
-                    "Ahora responde la pregunta de abajo."
-                );
+                this.acierto("¡Robi llegó al hueso! " + this.cierre());
             } else {
                 this.acierto("¡Robi llegó al hueso! Muy bien. Pasa al siguiente nivel.");
                 const siguiente = document.createElement("button");
