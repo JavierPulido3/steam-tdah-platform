@@ -19,6 +19,18 @@
     {% else %}
     <p class="mensaje error">Respondiste: {{ elegida.texto }}. La respuesta correcta era: {{ correcta.texto }}.</p>
     {% endif %}
+
+    {# Ajuste de la prueba de usabilidad: el siguiente paso queda a la vista, justo debajo del resultado. #}
+    <div class="navegacion">
+        {% if siguiente %}
+        <a class="boton boton-grande" href="{{ url_for('main.leccion', leccion_id=siguiente.id) }}">Siguiente lección:
+            {{ siguiente.area }} →</a>
+        <a class="boton boton-secundario" href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a>
+        {% else %}
+        <p>Esta es la última lección del curso.</p>
+        <a class="boton boton-grande" href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a>
+        {% endif %}
+    </div>
 </div>
 {% endif %}
 
@@ -26,6 +38,11 @@
     {% for linea in leccion.contenido.split('\n') %}
     <p>{{ linea }}</p>
     {% endfor %}
+    {% if not respuesta %}
+    {# Ajuste de la prueba de usabilidad: primero se lee y luego se juega. El script lo muestra. #}
+    <button type="button" class="boton boton-grande empezar" id="empezar-actividad" hidden>Ya leí, vamos a
+        jugar</button>
+    {% endif %}
 </div>
 
 <div class="tarjeta" hidden>
@@ -40,8 +57,17 @@
     {% endif %}
 </div>
 
-{% if pregunta and not respuesta %}
+{% if pregunta and not respuesta and session.get('rol') == 'instructor' %}
+{# El instructor no responde cuestionarios: ve la pregunta sin el formulario. #}
 <div class="tarjeta">
+    <h2>Pregunta</h2>
+    <p>{{ pregunta.enunciado }}</p>
+    <p class="mensaje">Vista de instructor: aquí el estudiante responde la pregunta. Sus resultados aparecen en el
+        panel.</p>
+</div>
+{% elif pregunta and not respuesta %}
+{# Ajuste de la prueba de usabilidad: el script oculta la pregunta hasta que se termina la actividad. #}
+<div class="tarjeta" id="tarjeta-pregunta">
     <h2>Pregunta</h2>
     <p>{{ pregunta.enunciado }}</p>
 
@@ -57,7 +83,9 @@
 </div>
 {% endif %}
 
+{% if not respuesta %}
 <p><a href="{{ url_for('main.lecciones') }}">Volver a las lecciones</a></p>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

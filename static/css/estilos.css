@@ -537,6 +537,68 @@ details summary {
     border-radius: 3px;
 }
 
+/* ---------- Ajustes de la prueba de usabilidad ---------- */
+
+/* Lo que tiene el atributo hidden no se muestra, aunque tenga la clase .boton */
+[hidden] {
+    display: none !important;
+}
+
+/* Botones para seguir después de terminar la lección */
+.navegacion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.boton-grande {
+    font-size: 1.2rem;
+    padding: 0.9rem 1.8rem;
+}
+
+.boton-secundario {
+    background: var(--tarjeta);
+    color: var(--primario);
+    border: 2px solid var(--primario);
+}
+
+.boton-secundario:hover {
+    background: #e8f1fa;
+    color: var(--primario-oscuro);
+}
+
+/* Botón para leer primero y luego jugar */
+.empezar {
+    margin-top: 0.5rem;
+}
+
+/* "Siguiente ronda" y "Siguiente nivel": grandes y en verde para que no pasen desapercibidos */
+.boton-siguiente {
+    background: var(--ok);
+    font-size: 1.2rem;
+    padding: 0.9rem 1.8rem;
+    margin-top: 0.75rem;
+    box-shadow: 0 0 0 4px var(--ok-fondo);
+    animation: llamar 1.4s ease-in-out 3;
+}
+
+.boton-siguiente:hover {
+    background: #25663f;
+}
+
+@keyframes llamar {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
+}
+
 /* ---------- Movimiento reducido ---------- */
 
 @media (prefers-reduced-motion: reduce) {

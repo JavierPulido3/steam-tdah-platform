@@ -44,7 +44,7 @@ def instructor_requerido(vista):
 def inicio():
     if "usuario_id" not in session:
         return redirect(url_for("main.login"))
-    if session["rol"] == "instructor":
+    if session.get("rol") == "instructor":
         return redirect(url_for("main.panel"))
     return redirect(url_for("main.lecciones"))
 
@@ -112,6 +112,15 @@ def leccion(leccion_id):
             usuario_id=session["usuario_id"], leccion_id=leccion.id
         ).first()
 
+    # Siguiente lección del curso, para el botón que aparece al terminar.
+    siguiente = (
+        Leccion.query.filter(
+            Leccion.curso_id == leccion.curso_id, Leccion.orden > leccion.orden
+        )
+        .order_by(Leccion.orden)
+        .first()
+    )
+
     return render_template(
         "leccion.html",
         leccion=leccion,
@@ -120,6 +129,7 @@ def leccion(leccion_id):
         elegida=elegida,
         correcta=correcta,
         progreso=progreso,
+        siguiente=siguiente,
     )
 
 

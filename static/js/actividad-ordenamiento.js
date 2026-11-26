@@ -23,6 +23,7 @@ class ActividadOrdenamiento extends Actividad {
                 rocas: [],
                 maximo: 7,
                 guia: "Robi empieza arriba a la izquierda, mirando hacia la derecha. El hueso 🦴 es la meta.",
+                pista: "Pista: haz que Robi avance 2 veces, gire a la derecha y avance 2 veces más.",
             },
             {
                 filas: 5,
@@ -32,6 +33,7 @@ class ActividadOrdenamiento extends Actividad {
                 rocas: [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 3, y: 1 }],
                 maximo: 10,
                 guia: "Ahora hay rocas 🪨 que bloquean el paso. Busca otro camino hasta el hueso 🦴.",
+                pista: "Pista: primero baja 2 casillas (gira a la derecha y avanza 2 veces). Luego gira a la izquierda y avanza derecho hasta el hueso.",
             },
             {
                 filas: 5,
@@ -41,6 +43,7 @@ class ActividadOrdenamiento extends Actividad {
                 rocas: [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 2, y: 2 }, { x: 2, y: 3 }],
                 maximo: 12,
                 guia: "Hay un muro de rocas 🪨. Robi tiene que rodearlo para llegar al hueso 🦴.",
+                pista: "Pista: el muro no llega hasta abajo. Baja por la orilla izquierda hasta la última fila y luego avanza hacia la derecha.",
             },
         ];
         this.nivel = 0;
@@ -168,7 +171,14 @@ class ActividadOrdenamiento extends Actividad {
         this.botonBorrar.textContent = "Borrar todo";
         this.botonBorrar.addEventListener("click", () => this.borrarTodo());
 
-        this.acciones.append(this.botonEjecutar, this.botonBorrar);
+        // Pista del nivel: ayuda a entender cómo se arma la secuencia.
+        this.botonPista = document.createElement("button");
+        this.botonPista.type = "button";
+        this.botonPista.className = "objeto";
+        this.botonPista.textContent = "💡 Ver pista";
+        this.botonPista.addEventListener("click", () => this.decir(this.actual.pista));
+
+        this.acciones.append(this.botonEjecutar, this.botonBorrar, this.botonPista);
         this.zona.appendChild(this.acciones);
 
         this.pintarPrograma(-1);
@@ -194,6 +204,7 @@ class ActividadOrdenamiento extends Actividad {
         this.botonesBanco.forEach((b) => (b.disabled = si));
         this.botonEjecutar.disabled = si;
         this.botonBorrar.disabled = si;
+        this.botonPista.disabled = si;
     }
 
     pintarPrograma(activo) {

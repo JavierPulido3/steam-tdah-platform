@@ -4,6 +4,7 @@ class Actividad {
         this.mensaje = null;
         // La plantilla avisa si el estudiante ya respondió la pregunta de esta lección.
         this.yaRespondida = contenedor.dataset.respondida === "true";
+        this.avisoEnviado = false;
     }
 
     iniciar() {
@@ -30,6 +31,13 @@ class Actividad {
     decir(texto, tipo = "neutro") {
         this.mensaje.textContent = texto;
         this.mensaje.className = "mensaje-actividad " + tipo;
+
+        // Todas las actividades cierran con "¡Terminaste la actividad!".
+        // Cuando aparece ese texto se avisa a la página para que muestre la pregunta.
+        if (!this.avisoEnviado && texto.includes("Terminaste la actividad")) {
+            this.avisoEnviado = true;
+            this.el.dispatchEvent(new CustomEvent("actividad-terminada", { bubbles: true }));
+        }
     }
 
     acierto(texto) {
